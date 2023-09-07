@@ -1,3 +1,5 @@
+### https://github.com/kenkoooo/AtCoderProblems/blob/master/lambda-functions/time-estimator/rating.py
+
 import math
 from collections import defaultdict
 from typing import List, Optional
@@ -12,6 +14,8 @@ class ContestType(enum.Enum):
     NEW_ABC = 1999, 2400, 800, True   # 6 problems ABC
     NEW_ARC = 2799, 3200, 1200, True  # Officially rated ARC
     AGC = 9999, 9999, 1600, True
+
+    CUSTOM = 9999, 9999, 800, True
 
     UNRATED = None, None, None, None
 
@@ -38,7 +42,7 @@ class RatingSystem(object):
         self.past_performances = defaultdict(list)
         self.past_rounded_performances = defaultdict(list)
 
-    def update(self, standings: List[str], contest_type: ContestType):
+    def update(self, standings: List[str], contest_type: ContestType, weight: int=1):
         is_first_contest = not self.past_performances
         qualified_contestants = [contestant for contestant in standings if (self.calc_rating(contestant) or 0) <= contest_type.qualified_bound]
         a_perfs = [self.calc_a_perf(contestant, contest_type) for contestant in qualified_contestants]
