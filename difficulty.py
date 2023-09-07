@@ -1,3 +1,5 @@
+from sklearn.linear_model import LogisticRegression
+
 import scrape
 from rating import adjust_rating
 
@@ -41,8 +43,10 @@ for id in range(1, 50):
   solved_set = set(solved)
   failed = tuple(x for x in scoreboard if x not in solved_set and x in e2t)
 
-  solved_aperf = tuple(rating_aperf[e2t[x]] if e2t[x] in rating_aperf else 800 for x in solved)
-  failed_aperf = tuple(rating_aperf[e2t[x]] if e2t[x] in rating_aperf else 800 for x in failed)
+  # add some fake ppl so sklearn doesnt explode
+  solved_aperf = (*(5*[3500]), *(rating_aperf[e2t[x]] if e2t[x] in rating_aperf else 800 for x in solved))
+  failed_aperf = (*(5*[-10000]), *(rating_aperf[e2t[x]] if e2t[x] in rating_aperf else 800 for x in failed))
+  solve_count = len(solved)
 
   # def mean(data: 'list[float]') -> float:
   #   return sum(data)/len(data)
@@ -74,4 +78,20 @@ for id in range(1, 50):
     else: lb = m
   difficulty = round(lb)
   # difficulty = adjust_rating(lb, 19)
-  print(round(lb))
+
+  regressionDifficulty = -1
+  # try:
+  if True:
+    model = LogisticRegression(solver='liblinear', random_state=0)
+    model_data_x = tuple((x,) for x in (*solved_aperf, *failed_aperf))
+    model_data_y = (*(1 for x in solved_aperf), *(0 for x in failed_aperf))
+    model.fit(model_data_x, model_data_y)
+    # print(' '.join(f'{model.predict([[x]])[0]:.0f}' for x in range(0, 3000, 500)), end='\t')
+    for x in range(-10000, 10000, 10):
+      if model.predict([[x]])[0] >= 0.5:
+        regressionDifficulty = x
+        break
+  # except:
+  #   regressionDifficulty = 9999
+  print('\t'.join(str(x) for x in (solve_count, difficulty, regressionDifficulty)))
+
