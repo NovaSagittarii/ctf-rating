@@ -23,7 +23,7 @@ TASKS = [
   (21, 'rf/monke (1)'),
 ]
 
-base_url = 'https://2023.irisc.tf/'
+base_url = 'https://hope.dicega.ng/'
 scoreboard = scrape.fetchScoreboard(base_url)
 e2t = {} # event to team id mapping
 
@@ -31,22 +31,28 @@ for i, id in enumerate(scoreboard):
   if i >= len(standings): break
   e2t[id] = standings[i]
 
-for id in range(1, 50):
-  # if id != 21: continue
-  challenge = scrape.fetchChallenge(base_url, id)
+# print(e2t)
+
+# for id in range(1, 50):
+#   # if id != 21: continue
+#   challenge = scrape.fetchChallenge(base_url, id)
+for challenge in scrape.fetchChallenges(base_url):
   if challenge is None: continue
   # print(challenge)
   name = challenge['name']
   solved = challenge['solved']
 
-  print('\t'.join(str(x) for x in (id, name)), end='\t')
+  print('\t'.join(str(x) for x in (name,)), end='\t')
   solved_set = set(solved)
   failed = tuple(x for x in scoreboard if x not in solved_set and x in e2t)
 
   # add some fake ppl so sklearn doesnt explode
-  solved_aperf = (*(5*[3500]), *(rating_aperf[e2t[x]] if e2t[x] in rating_aperf else 800 for x in solved))
-  failed_aperf = (*(5*[-10000]), *(rating_aperf[e2t[x]] if e2t[x] in rating_aperf else 800 for x in failed))
+  solved_aperf = (*(5*[3500]), *(rating_aperf[e2t[x]] if e2t[x] in rating_aperf else 800 for x in solved if x in e2t))
+  failed_aperf = (*(5*[-10000]), *(rating_aperf[e2t[x]] if e2t[x] in rating_aperf else 800 for x in failed if x in e2t))
   solve_count = len(solved)
+  # print()
+  # print(solved)
+  # print(solved_aperf)
 
   # def mean(data: 'list[float]') -> float:
   #   return sum(data)/len(data)

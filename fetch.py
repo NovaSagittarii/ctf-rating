@@ -7,6 +7,7 @@ import file_cache as CACHE
 import rating as RATING
 
 def fetch_json(url: str) -> dict:
+  print(url)
   cached = CACHE.lookup_key(url)
   if cached is not None: data = json.loads(cached)
   else:
@@ -40,10 +41,10 @@ if __name__ == '__main__':
       if event['weight'] <= 0: continue
       # print(year, id, event_result['title'])
       standings = tuple(str(x['team_id']) for x in sorted(event_result['scores'], key=lambda x: float(x['points']), reverse=True))
-      # if int(id) == 1774:
-      #   print(len(standings))
-      #   print(" ".join(standings))
-      #   break
+      if int(id) == 1706:
+        print(len(standings))
+        print(" ".join(standings))
+        break
       
       contest_type = RATING.ContestType.CUSTOM # RATING.ContestType.AGC if event['weight'] else RATING.ContestType.UNRATED
       rating_system.update(standings=standings, contest_type=contest_type, weight=1+(event['weight']/100*0.5))
